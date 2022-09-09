@@ -18,13 +18,14 @@ def to_img(x):
 
 #config
 batch_size = 128
-num_epoch = 100
+num_epoch = 200
 dimensions = 100
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 img_transform = transforms.Compose([
     transforms.ToTensor(),
-    transforms.Normalize((0.5,), (0.5,))  # (x-mean) / std
+    # normalize with mean=0.5 std=0.5
+    transforms.Normalize((0.5,), (0.5,))  # (x-mean) / std 
 ])
 
 
@@ -61,10 +62,13 @@ class generator(nn.Module):
         super(generator, self).__init__()
         self.gen = nn.Sequential(
             nn.Linear(100, 256),  
+            nn.BatchNorm1d(256),
             nn.ReLU(True),  
             nn.Linear(256, 512),
+            nn.BatchNorm1d(512),
             nn.ReLU(True),  
             nn.Linear(512, 512),
+            nn.BatchNorm1d(512),
             nn.ReLU(True),  
             nn.Linear(512, 784), 
             nn.Tanh()  # Tanh激活使得生成数据分布在[-1,1]之间，因为输入的真实数据的经过transforms之后也是这个分布
